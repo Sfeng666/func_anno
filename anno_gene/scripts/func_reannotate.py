@@ -118,9 +118,8 @@ with open(in_coord, 'r') as f, open(out_tab, 'a') as out:
             if cds == 0:
                 cds_start = start
                 cds = 1
-            elif cds == 1:
-                cds_end = end
-                cds_strand = strand
+            cds_end = end
+            cds_strand = strand
 
         else:
             if cds == 1:
