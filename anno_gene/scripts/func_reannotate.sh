@@ -74,7 +74,7 @@ in_coord=$dir_coord/reannotate_{2}.bed
 
 # output
 sep_dir=$wd/sep
-out_tab_sep=$sep_dir/anno_{1}.txt
+out_tab_sep=$sep_dir/anno_{1}_{2}.txt
 out_tab=$wd/anno_genome.txt
 log=$wd/reannotate.log
 temp=$wd/temp
@@ -109,15 +109,8 @@ echo "annotation done for $contig at chromosome $mapchr" >> $log
 
 ## function to parallel by contig
 function para() {
-awk 'BEGIN{OFS="\t"} $2 != "na" && NR>1{print $2, $1}' $chr_assignment | sort -k1 \
+awk 'BEGIN{OFS="\t"} NR>1{print $2, $1}' $chr_assignment | sort -k1 \
 | parallel --tmpdir $temp -j 0 -k --colsep '\t' \
-"$@"
-}
-
-## function to parallel by chromosome
-function para_chr() {
-awk 'BEGIN{OFS="\t"} $2 != "na" && NR>1{print $2}' $chr_assignment | sort | uniq \
-| parallel --tmpdir $temp -j 0 -k \
 "$@"
 }
 
@@ -135,15 +128,6 @@ para \
 anno {1} {2} $in_coord $out_tab_sep $script $in_ortho $in_anno $log
 
 echo -e "### Reannotations ends ###\n" >> $log
-
-## 3.2. merge outputs
-echo -e "### Merging starts ###\n" >> $log
-
-# merge bed files
-para_chr \
-cat $out_tab_sep >> $out_tab
-
-echo -e "### Merging ends ###\n" >> $log
 
 ### script ends ###
 rm -r $temp
